@@ -1,0 +1,387 @@
+---
+title: "Manipulação de dados"
+author: "José Felipe Custódia de Azevedo/ josefelipe0036@gmail.com"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Respostas:
+
+**Observações: o trabalho foi realizado com software R e o relatório com o 
+R Markdown, para reduzir o tamanho do arquivo, os gráficos gerados estarão 
+junto com os códigos.**
+
+## Questão 1
+Na primeira questão foi ultilizado o método de remoção dos valores faltantes
+através da função *filter* junto com a função *is.na*, no qual, a combinação resulta
+em uma filtragem dos NA's onde quando é usado o sinal de exclamação significa 
+uma negação, ou seja, seleciona tudo menos a condição que foi colocada no filter.
+Poderia ter sido usado outro método em que consiste em substituir o valor ausente
+ pela média da variável mas por ser mais prático usei o primeiro. Usei a variável *hf_rank* para remover todos os NA's.
+ 
+## Questão 2
+Fiz a soma das variáveis e salvei como um valor, posteriormente foi usado a função
+*mutate* para "juntar" o total de medalhas com a base de dados.
+
+## Questão 3
+
+A quantidade de medalha de ouro foi organizada de forma decrescente para montar 
+o ranking, foram usadas as funções *arrange*, *desc* e *head* para mostrar os
+10 primeiros países que mais tinham medalhas de ouro, e também que mais tinham 
+medalhas.
+
+## Questão 4
+Foi criado um novo dataset baseado no *Countries*, só que os dados foram agrupados
+pela região e criado uma coluna com a média de alfabetização por região, usando a função *summarise*.
+
+## Questão 5
+A questão 5 seguiu a mesma lógica da questão 3, só que foi usado a função *select*
+para facilitar na plotagem do gráfico.
+
+## Questão 6
+Foi usado a função *filter*, com as condições de que o ano seja 2018.
+
+## Questão 7
+A função *filter* foi usada para selecionar o Brasil, para facilitar a visualização
+foi feito um gráfico de linha.
+
+## Questão 8
+Os dados foram agrupados pela região, logo em seguida foi calculada a média da região.
+
+## Questão 9
+Não, pois foi calculado o coeficiente de correlação, onde obteve -0.08, que significa
+que não a correlação é muito fraca, pois a correlação varia de -1 a 1, onde <0
+é fraca.
+
+## Questão 10
+Foi usado a mesma lógica da 3, só que em vez das medalhas de ouro, foram as de bronze.
+
+## Questão 11
+Foi usado a função *scale* para escalonar algumas variáveis do banco de dados,
+foi necessário transformar em *numeric* uma coluna. Não foi salvo o escalonamento
+para não inferir nas questões posteriores, pois o escalonamento seria mais funcional
+para a criação de algum algoritmo de IA ou aprendizado de máquina.
+
+## Questão 12
+Sim, foi observado o valor de 0.04, onde significa que existem uma correlação e 
+uma relação moderada. Podemos afirmar que há causalidade, pois podemos afirmar que
+o índice de nascimento infere no índice de mortalidade.
+
+## Questão 13
+Sim, foi observado uma correlação de 0.2, tem uma relação relativamente boa, pois,
+levando em consideração que agricultura costuma ser um trabalho em coletivo que 
+diversas pessoas buscam um objetivo em comum, portanto o teórico
+de movimentos sociais Tilly (1981, p. 17), há ação coletiva
+em “[...] todas as ocasiões em que grupos de pessoas
+mobilizam recursos, incluindo seus próprios esforços,
+para alcançar objetivos comuns”.
+
+
+## Questão 14
+Com base em um boxplot que mostra melhor a distribuição dos dados e também através
+da amplitude dos dados, o Equador foi o país em que mais aumentou o índice em
+relação ao tempo.
+
+## Questão 15
+Bem houve um impacto negativo, pois se observamos os dados do ano de 2013 a 2018,
+pois de 2013 até 2015 os Estados Unidos saiu da posição 17° para 13°, onde em 2016
+o EUA foia para a 14°, ou seja, caiu uma posição.
+
+## Questão 16
+Sim, pois o valor foi de 0,46. Pois, quando o tamanho amostral é grande, ele otimiza 
+o resultado, pois aumenta a probabilidade encontrar um atleta de ponta. Para realizar 
+essa questão tive que juntar dois bancos de dados *countries* e *medals_olympics*,
+foi usado a função *inner_join* para juntar os dados,onde facilitou a achar a correlação.
+
+## Questão 17
+Para facilitar, primeiramente foi removido a variável *GDP per capita* para não haver
+"erro", apois isso todos os 4 bancos de dados foram unidos, onde o Brasil deveria
+melhorar a *GDP per capita*, o índice de alfabetizção e a liberdade de escolha, 
+pois todas as variáveis foram escolhidas atráves da correlação.
+
+## Questão 18
+Países litorâneos com base na correlação investem mais em indústria do que na agricultura,
+pois um dos possíveis motivos é que por ser litorâneo, a indústria é mais movimentada, por 
+exemplo se torna mais barato o transporte de produtos industriais, etc.
+
+
+## Questão 19
+Foi selecionado *Country* e *Region* do banco de dados Countries e depois foi colocado
+junto com medals_olympics, onde foi feita a soma das medalhas por região, onde a 
+região que mais obteve medalha foi a Europa Ocidental.
+
+
+# Códigos e imagens
+
+
+
+```{r}
+library(readxl)#carregando as bibliotecas
+library(tidyverse)
+countries <- read_excel("~/Área de Trabalho/countries.xlsx")
+human_freedom<-read_xlsx("~/Área de Trabalho/human_freedom.xlsx")#lendo os dados
+medals_olympics<- read_xlsx("~/Área de Trabalho/medals_olympics.xlsx")
+hapiness_report<-read_xlsx("~/Área de Trabalho/hapiness_report.xlsx")
+```
+
+## Questão1
+
+```{r}
+summary(human_freedom)
+
+##limpando humam_freedom Método1
+#human_freedom$hf_score= ifelse(is.na(human_freedom$hf_score),
+                               #mean(human_freedom$hf_score, na.rm = T),
+                               #human_freedom$hf_score)
+#human_freedom$hf_score==0.0 #verificando se há alguma observação zerada
+#human_freedom$hf_score<0 #verificando se há alguam obs menor do que zero
+
+##limpando humam_freedom pelo metodo2, usando como referência hf_rank
+human_freedom<-filter(human_freedom, !is.na(human_freedom$hf_rank))
+#is.na(human_freedom) testando se há NA
+```
+## Questão 2
+```{r}
+Total<-medals_olympics$`Gold Medal`+medals_olympics$`Silver Medal`+medals_olympics$`Bronze Medal`
+medals_olympics=mutate(medals_olympics,Total)
+head(medals_olympics)
+```
+
+## Questão 3
+```{r}
+head(top<-head(arrange(medals_olympics,
+                       desc('Gold Medal')),10))#lista dos 10 maiores medalhista de ouro.
+
+ggplot(top) +
+  aes(x = Country, weight = `Gold Medal`) +
+  geom_bar(fill = "#FF8C00") +
+  labs(
+    x = "Países",
+    y = "Quantidade de medalhas",
+    title = "Ranking dos países nas Olímpiadas",
+    subtitle = "Medalha de ouro",
+    caption = "Medals_olympics"
+  ) +
+  coord_flip() +
+  theme_classic()#gráfico de coluna dos 10 maiores medalhista de ouro.
+
+head(arrange(medals_olympics, desc(Total)),10)# maiore medalhistas pelo total.
+```
+
+## Questão 4
+
+```{r}
+ggplot(countries) +
+  aes(x = Region, y = `Literacy (%)`) +
+  geom_boxplot(shape = "circle", fill = "#22B290") +
+  labs(title = "Literacy per region", caption = "Countries") +
+  coord_flip()+
+  theme_classic()#Boxplot para mostrar a variação 
+
+region_literacy<-countries%>%
+  group_by(Region)%>%
+  summarise(mean_region = mean(`Literacy (%)`))
+
+
+ggplot(region_literacy) +
+  aes(x = Region, weight = mean_region) +
+  geom_bar(fill = "#4682B4") +
+  labs(
+    x = "Regiões",
+    y = "Taxa média de alfabetização",
+    title = "Média de alfabetização por região",
+    caption = "countries"
+  ) +
+  coord_flip() +
+  theme_classic()# média de alfabetização por região
+
+```
+
+## Questão 5
+```{r}
+phone_per1000<-head(arrange(countries,desc(`Phones (per 1000)`)),5)%>%
+  select(Country, 'Phones (per 1000)')
+
+
+ggplot(phone_per1000) +
+  aes(x = Country, weight = `Phones (per 1000)`) +
+  geom_bar(fill = "#014654") +
+  labs(
+    x = "Países",
+    y = "Número de celulares a cada mil habitantes.",
+    title = "Os cinco países com maior número de celulares a cada mil habitantes.",
+    caption = "Countries"
+  ) +
+  theme_classic()# 5 países com mais numeros a cada 100 mil habitantes
+```
+
+## Questão 6
+```{r}
+human_freedom%>%
+  filter(year == 2018)%>%
+  head()
+```
+
+
+## Questão 7
+
+```{r}
+(grafico_brasil<-human_freedom%>%
+  filter(countries=="brazil")%>%
+  select(year, countries, hf_score)%>%
+  ggplot() +
+  aes(x = year, y = hf_score) +
+  geom_line(size = 2.5, colour = "#EF562D") +
+  labs(title = "A evolução do hf_score (human freedom score) do Brasil",
+       caption = "human_ffredom") +
+  theme_minimal() +
+  xlim(2007L, 2018L)) #gráfico de linha da evolução de hf_score
+```
+
+## Questão 8
+```{r}
+region_pop<-countries%>%
+  group_by(Region)%>%
+  summarise(pop_region = mean(Population))
+head(arrange(region_pop, desc(pop_region)),1)#maior média populacional por região
+```
+## Questão 9
+```{r}
+  
+cor(countries$Population, countries$`Net migration`) # Calculando correlação
+```
+
+## Questão 10
+
+```{r}
+(bronze<-head(
+  arrange(medals_olympics, 
+          desc(medals_olympics$`Bronze Medal`)),10))
+
+
+ggplot(bronze) +
+  aes(x = Country, weight = `Bronze Medal`) +
+  geom_bar(fill = "#FF8C00") +
+  labs(
+    x = "Países",
+    y = "Quantidade de medalhas",
+    title = "Ranking dos países nas Olímpiadas",
+    subtitle = "Medalha de bronze",
+    caption = "Medals_olympics"
+  ) +
+  coord_flip() +
+  theme_classic()# Maiores medalhistas de bronze
+
+
+```
+
+## Questão 11
+
+```{r}
+medal_scale <-(scale(medals_olympics[,2:4]))
+countries_scale <-(scale(countries[,3:20]))
+human_freedom$womens_freedom = as.numeric(human_freedom$womens_freedom)
+# Transformando womens_freedom em número para o escalonamento
+human_scale <-(scale(human_freedom[,5:12]))
+hapiness_scale <-(scale(hapiness_report[,3:9]))
+
+head(medal_scale)
+head(countries_scale)
+head(human_scale)
+head(hapiness_scale)
+```
+
+## Questão 12
+```{r}
+teste<-filter(countries,!is.na(countries$Deathrate)) #Excluindo os NA's
+cor(teste$Birthrate, teste$Deathrate)# Calculando a correlação
+```
+
+## Questão 13
+```{r}
+cor(hapiness_report$Generosity, countries$Agriculture)#correlação
+
+```
+
+## Questão 14 - Em branco
+
+## Questão 15 
+```{r}
+
+
+
+ggplot(human_freedom) +
+ aes(x = countries, y = pf_ss_homicide) +
+ geom_boxplot(shape = "circle", fill = "#B22222") +
+ coord_flip() +
+ theme_minimal()#boxplot para visualizar a maior variação de pf_ss_homicide
+
+
+equador<-human_freedom%>%
+  filter(countries== "ecuador")
+diff(range(equador$pf_ss_homicide))#amplitude
+
+```
+
+## Questão 16
+```{r}
+human_freedom%>%
+  select(countries, hf_score, year, hf_rank)%>%
+  filter(countries=="unitedstates")%>%
+  head()
+```
+
+
+## Questão 17
+
+```{r}
+base<-inner_join(countries, medals_olympics, by= "Country")
+cor(base$Population, base$`Gold Medal`)
+```
+
+## Questão 18
+
+```{r}
+teste<-select(hapiness_report, !'GDP per capita')
+teste<- teste%>%
+  rename(Country= Countryorregion)
+base<-inner_join(base, teste, by= "Country")
+
+base<-rename(human_freedom, Country= countries)%>%
+  inner_join(base, human_freedom, by = "Country")
+cor(base$`GDP ($ per capita)`, base$`Gold Medal`)
+cor(base$`Literacy (%)`, base$`Gold Medal`)
+cor(base$`Gold Medal`, base$`Freedom to make life choices`)
+```
+
+## Questão 19
+```{r}
+
+cor(countries$`Coastline (coast/area ratio)`, countries$Agriculture)
+cor(countries$`Coastline (coast/area ratio)`, countries$Industry)
+```
+
+## Questão 20
+
+```{r}
+base_medalha<-countries%>%
+  select(Country, Region)%>%
+  inner_join(medals_olympics, by= "Country")
+
+
+region_medalha<-base_medalha%>%
+  group_by(Region)%>%
+  summarise(medalha_region = sum(Total))
+
+
+
+ggplot(region_medalha) +
+  aes(x = Region, weight = medalha_region) +
+  geom_bar(fill = "#FF8C00") +
+  coord_flip()
+  labs(title = "Medalhas por região") +
+  theme_classic()#medalha por regiao
+```
